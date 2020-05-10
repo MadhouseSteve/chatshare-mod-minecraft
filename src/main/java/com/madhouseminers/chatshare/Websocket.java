@@ -27,7 +27,7 @@ public class Websocket {
         this.cs = cs;
         EventLoopGroup loop = new NioEventLoopGroup();
         Bootstrap b = new Bootstrap();
-        URI uri = URI.create("ws://localhost:8080/ws");
+        URI uri = URI.create("ws://" + Config.SERVER.get() + ":" + Config.PORT.get() + "/ws");
 
         final WebSocketClientProtocolHandler handler = new WebSocketClientProtocolHandler(
                 WebSocketClientHandshakerFactory.newHandshaker(
@@ -39,7 +39,7 @@ public class Websocket {
 
         b.group(loop).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>() {
             @Override
-            protected void initChannel(SocketChannel ch) throws Exception {
+            protected void initChannel(SocketChannel ch) {
                 ch.pipeline().addLast(
                         new HttpClientCodec(),
                         new HttpObjectAggregator(8192),
