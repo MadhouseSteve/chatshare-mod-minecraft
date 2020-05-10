@@ -5,9 +5,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.EmptyHttpHeaders;
-import io.netty.handler.codec.http.HttpClientCodec;
-import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketClientProtocolHandler;
@@ -22,16 +20,20 @@ public class Websocket {
     private static final Logger LOGGER = LogManager.getLogger();
     private Chatshare cs;
     private Channel ch;
+    private EventLoopGroup loop;
 
     public Websocket(Chatshare cs) {
         this.cs = cs;
-        EventLoopGroup loop = new NioEventLoopGroup();
+        loop = new NioEventLoopGroup();
         Bootstrap b = new Bootstrap();
         URI uri = URI.create("ws://" + Config.SERVER.get() + ":" + Config.PORT.get() + "/ws");
 
+        HttpHeaders headers = new DefaultHttpHeaders();
+        headers.add("authorization", Config.IDENTIFIER.get() + ":" + Config.PASSWORD.get());
+
         final WebSocketClientProtocolHandler handler = new WebSocketClientProtocolHandler(
                 WebSocketClientHandshakerFactory.newHandshaker(
-                        uri, WebSocketVersion.V13, null, false, EmptyHttpHeaders.INSTANCE
+                        uri, WebSocketVersion.V13, null, false, headers
                 )
         );
 
@@ -61,5 +63,10 @@ public class Websocket {
     public void sendMessage(String message) {
         LOGGER.info("Sending a message to ChatShare service: " + message);
         this.ch.writeAndFlush(new TextWebSocketFrame(message));
+    }
+
+    public void close() {
+        this.ch.close();
+        this.loop.shutdownGracefully();
     }
 }

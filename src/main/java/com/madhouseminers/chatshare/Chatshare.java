@@ -42,6 +42,7 @@ public class Chatshare {
     }
 
     public void reconnectWebsocket() {
+        this.ws.close();
         new Thread(() -> {
             try {
                 Thread.sleep(1000);
