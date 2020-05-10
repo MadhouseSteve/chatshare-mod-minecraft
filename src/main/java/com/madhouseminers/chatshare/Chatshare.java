@@ -2,15 +2,13 @@ package com.madhouseminers.chatshare;
 
 import net.minecraft.block.Block;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,15 +43,14 @@ public class Chatshare {
                 this.ws = new Websocket(this);
             }
             catch (Exception e){
-                System.err.println(e);
+                LOGGER.error(e.getMessage());
             }
         }).start();
     }
 
     @SubscribeEvent
-    public void onServerStarting(FMLServerStartingEvent event) {
+    public void onServerStarted(FMLServerStartedEvent event) {
         this.server = event.getServer();
-        LOGGER.info("HELLO from server starting");
         this.connectWebsocket();
     }
 
