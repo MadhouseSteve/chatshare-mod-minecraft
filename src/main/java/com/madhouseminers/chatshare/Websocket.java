@@ -28,12 +28,9 @@ public class Websocket {
         Bootstrap b = new Bootstrap();
         URI uri = URI.create("ws://" + Config.SERVER.get() + ":" + Config.PORT.get() + "/ws");
 
-        HttpHeaders headers = new DefaultHttpHeaders();
-        headers.add("authorization", Config.IDENTIFIER.get() + ":" + Config.PASSWORD.get());
-
         final WebSocketClientProtocolHandler handler = new WebSocketClientProtocolHandler(
                 WebSocketClientHandshakerFactory.newHandshaker(
-                        uri, WebSocketVersion.V13, null, false, headers
+                        uri, WebSocketVersion.V13, null, false, EmptyHttpHeaders.INSTANCE
                 )
         );
 

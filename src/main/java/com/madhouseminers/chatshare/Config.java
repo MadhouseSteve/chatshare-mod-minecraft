@@ -23,8 +23,6 @@ public class Config {
         COMMON_BUILDER.comment("Chatshare settings").push(CATEGORY_SERVER);
         SERVER = COMMON_BUILDER.comment("Server").define("server", "localhost");
         PORT = COMMON_BUILDER.comment("Port").defineInRange("port", 8080, 1000, 65535);
-        PASSWORD = COMMON_BUILDER.comment("Password").define("password", "");
-        IDENTIFIER = COMMON_BUILDER.comment("Identifier").define("identifier", "");
         COMMON_BUILDER.pop();
 
         COMMON_CONFIG = COMMON_BUILDER.build();
