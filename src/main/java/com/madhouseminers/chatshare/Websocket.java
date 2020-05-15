@@ -10,7 +10,6 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketClientProtocolHandler;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
-import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.apache.logging.log4j.LogManager;
@@ -46,9 +45,9 @@ public class Websocket extends Thread {
     public void reconnect() {
         this.close();
         try {
-            this.sleep(1000);
+            sleep(1000);
         } catch (Exception e) {
-            LOGGER.info("Sleep interrupted: " + e.getMessage());
+            LOGGER.info("Sleep interrupted");
         }
         this.connect();
     }
@@ -86,12 +85,12 @@ public class Websocket extends Thread {
             }
         });
 
-        this.b.connect(uri.getHost(), uri.getPort()).addListener((ChannelFuture f) -> {
+        ChannelFuture bf = this.b.connect(uri.getHost(), uri.getPort());
+        this.ch = bf.channel();
+        bf.addListener((ChannelFuture f) -> {
             if (!f.isSuccess()) {
                 LOGGER.warn("Unable to connect to ChatShare service. Retrying in 10 seconds.");
-                f.channel().eventLoop().schedule(() -> {
-                    this.reconnect();
-                }, 10, TimeUnit.SECONDS);
+                f.channel().eventLoop().schedule(this::reconnect, 10, TimeUnit.SECONDS);
             } else {
                 LOGGER.info("Connected to ChatShare");
             }
@@ -100,7 +99,7 @@ public class Websocket extends Thread {
 
     public void close() {
         try {
-//            this.ch.close();
+            this.ch.close();
             this.loop.shutdownGracefully();
         } catch (Exception e) {
             LOGGER.error("Unable to close ChatShare connection: " + e.getMessage());
