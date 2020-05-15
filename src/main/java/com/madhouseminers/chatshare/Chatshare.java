@@ -16,6 +16,13 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.security.KeyStore;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod("chatshare")
 public class Chatshare {
@@ -29,6 +36,18 @@ public class Chatshare {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
         MinecraftForge.EVENT_BUS.register(this);
+
+        try {
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            char[] pwdArray = "password".toCharArray();
+            ks.load(null, pwdArray);
+            ks.setCertificateEntry("chatshare.madhouseminers.com", CertificateFactory.getInstance("X.509").generateCertificate(new FileInputStream("/home/steve/GolandProjects/chatshare-server/ca.cer")));
+            try (FileOutputStream fos = new FileOutputStream("newKeyStoreFileName.jks")) {
+                ks.store(fos, pwdArray);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error loading keystore");
+        }
     }
 
     private void setup(final FMLCommonSetupEvent event) {
@@ -37,27 +56,11 @@ public class Chatshare {
         Config.loadConfig(Config.COMMON_CONFIG, FMLPaths.CONFIGDIR.get().resolve("chatshare-common.toml"));
     }
 
-    public void connectWebsocket() {
-        this.ws = new Websocket(this);
-    }
-
-    public void reconnectWebsocket() {
-        this.ws.close();
-        new Thread(() -> {
-            try {
-                Thread.sleep(1000);
-                this.ws = new Websocket(this);
-            }
-            catch (Exception e){
-                LOGGER.error(e.getMessage());
-            }
-        }).start();
-    }
-
     @SubscribeEvent
     public void onServerStarted(FMLServerStartedEvent event) {
         this.server = event.getServer();
-        this.connectWebsocket();
+        this.ws = new Websocket(this);
+        this.ws.start();
     }
 
     @SubscribeEvent

@@ -7,13 +7,13 @@ import net.minecraft.util.text.StringTextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.concurrent.TimeUnit;
-
 public class WebsocketHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
     private Chatshare cs;
+    private Websocket ws;
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public WebsocketHandler(Chatshare cs) {
+    public WebsocketHandler(Websocket ws, Chatshare cs) {
+        this.ws = ws;
         this.cs = cs;
     }
 
@@ -26,9 +26,9 @@ public class WebsocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        LOGGER.info("Channel Inactive");
+        LOGGER.info("Connection to ChatShare lost.");
         ctx.channel().close();
         ctx.close();
-        this.cs.reconnectWebsocket();
+        this.ws.reconnect();
     }
 }
