@@ -36,23 +36,9 @@ public class Chatshare {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_CONFIG);
         MinecraftForge.EVENT_BUS.register(this);
-
-        try {
-            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-            char[] pwdArray = "password".toCharArray();
-            ks.load(null, pwdArray);
-            ks.setCertificateEntry("chatshare.madhouseminers.com", CertificateFactory.getInstance("X.509").generateCertificate(new FileInputStream("/home/steve/GolandProjects/chatshare-server/ca.cer")));
-            try (FileOutputStream fos = new FileOutputStream("newKeyStoreFileName.jks")) {
-                ks.store(fos, pwdArray);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Error loading keystore");
-        }
     }
 
     private void setup(final FMLCommonSetupEvent event) {
-        // some preinit code
-        LOGGER.info("HELLO FROM PREINIT");
         Config.loadConfig(Config.COMMON_CONFIG, FMLPaths.CONFIGDIR.get().resolve("chatshare-common.toml"));
     }
 
@@ -66,16 +52,5 @@ public class Chatshare {
     @SubscribeEvent
     public void gotChatEvent(ServerChatEvent event) {
         this.ws.sendMessage("<" + event.getUsername() + "> " + event.getMessage());
-    }
-
-    // You can use EventBusSubscriber to automatically subscribe events on the contained class (this is subscribing to the MOD
-    // Event bus for receiving Registry Events)
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class RegistryEvents {
-        @SubscribeEvent
-        public static void onBlocksRegistry(final RegistryEvent.Register<Block> blockRegistryEvent) {
-            // register a new block here
-            LOGGER.info("HELLO from Register Block");
-        }
     }
 }

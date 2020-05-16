@@ -42,16 +42,6 @@ public class Websocket extends Thread {
         this.connect();
     }
 
-    public void reconnect() {
-        this.close();
-        try {
-            sleep(1000);
-        } catch (Exception e) {
-            LOGGER.info("Sleep interrupted");
-        }
-        this.connect();
-    }
-
     public void connect() {
         LOGGER.info("Trying to connect to ChatShare service.");
         this.loop = new NioEventLoopGroup();
@@ -71,7 +61,7 @@ public class Websocket extends Thread {
                     ch.pipeline().addLast(
                             SslContextBuilder
                                     .forClient()
-                                    .trustManager(InsecureTrustManagerFactory.INSTANCE)
+                                    .trustManager(InsecureTrustManagerFactory.INSTANCE) // TODO Remove this line when we have proper client/server auth
                                     .build()
                                     .newHandler(ch.alloc(), uri.getHost(), uri.getPort()),
                             new HttpClientCodec(),
@@ -95,6 +85,16 @@ public class Websocket extends Thread {
                 LOGGER.info("Connected to ChatShare");
             }
         });
+    }
+
+    public void reconnect() {
+        this.close();
+        try {
+            sleep(1000);
+        } catch (Exception e) {
+            LOGGER.info("Sleep interrupted");
+        }
+        this.connect();
     }
 
     public void close() {
