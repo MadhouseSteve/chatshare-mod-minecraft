@@ -20,7 +20,11 @@ public class WebsocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) {
         LOGGER.info("Received a message from the ChatShare service: " + msg.text());
-        this.cs.server.getPlayerList().sendMessage(new StringTextComponent(msg.text()));
+        if (msg.text().equals("HELLO")) {
+            this.ws.sendMessage(Config.NAME.get());
+        } else {
+            this.cs.server.getPlayerList().sendMessage(new StringTextComponent(msg.text()));
+        }
     }
 
     @Override

@@ -10,8 +10,6 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketClientProtocolHandler;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -59,11 +57,6 @@ public class Websocket extends Thread {
             protected void initChannel(SocketChannel ch) {
                 try {
                     ch.pipeline().addLast(
-                            SslContextBuilder
-                                    .forClient()
-                                    .trustManager(InsecureTrustManagerFactory.INSTANCE) // TODO Remove this line when we have proper client/server auth
-                                    .build()
-                                    .newHandler(ch.alloc(), uri.getHost(), uri.getPort()),
                             new HttpClientCodec(),
                             new HttpObjectAggregator(8192),
                             handler,
