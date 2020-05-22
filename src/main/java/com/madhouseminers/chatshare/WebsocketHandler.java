@@ -7,6 +7,8 @@ import net.minecraft.util.text.StringTextComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Base64;
+
 public class WebsocketHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
     private Chatshare cs;
     private Websocket ws;
@@ -21,7 +23,7 @@ public class WebsocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) {
         LOGGER.info("Received a message from the ChatShare service: " + msg.text());
         if (msg.text().equals("HELLO")) {
-            this.ws.sendMessage(Config.NAME.get());
+            this.ws.sendMessage(Config.NAME.get() + "::" + new String(Base64.getDecoder().decode(Config.PASSWORD.get())), true);
         } else {
             this.cs.server.getPlayerList().sendMessage(new StringTextComponent(msg.text()));
         }

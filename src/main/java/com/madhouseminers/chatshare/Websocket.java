@@ -32,7 +32,15 @@ public class Websocket extends Thread {
     }
 
     public void sendMessage(String message) {
-        LOGGER.info("Sending a message to ChatShare service: " + message);
+        this.sendMessage(message, false);
+    }
+
+    public void sendMessage(String message, boolean secret) {
+        if (secret) {
+            LOGGER.info("Sending a secret message to ChatShare service");
+        } else {
+            LOGGER.info("Sending a message to ChatShare service: " + message);
+        }
         this.ch.writeAndFlush(new TextWebSocketFrame(message));
     }
 
