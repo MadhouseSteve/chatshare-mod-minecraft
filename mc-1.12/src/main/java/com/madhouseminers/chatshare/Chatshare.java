@@ -65,19 +65,19 @@ public class Chatshare implements ChatShareMod {
     @SideOnly(Side.SERVER)
     @SubscribeEvent
     public void onServerChat(ServerChatEvent event) {
-        this.ws.sendMessage("<" + event.getUsername() + "> " + event.getMessage());
+        this.ws.chatMessage(event.getUsername(), event.getMessage());
     }
 
     @SideOnly(Side.SERVER)
     @SubscribeEvent
     public void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        this.ws.sendMessage(event.player.getDisplayNameString() + " has joined " + this.config.getName());
+        this.ws.playerJoined(event.player.getDisplayNameString());
     }
 
     @SideOnly(Side.SERVER)
     @SubscribeEvent
     public void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
-        this.ws.sendMessage(event.player.getDisplayNameString() + " has left " + this.config.getName());
+        this.ws.playerLeft(event.player.getDisplayNameString());
     }
 
     public void broadcast(String message) {

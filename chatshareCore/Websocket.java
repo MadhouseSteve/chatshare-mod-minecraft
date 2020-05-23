@@ -116,4 +116,34 @@ public class Websocket extends Thread {
             LOGGER.error("Unable to close ChatShare connection: " + e.getMessage());
         }
     }
+
+    /**
+     * Sends the chat message to the chatshare network
+     *
+     * @param String playerName The display name of the player
+     * @param String message The message that the player sent
+     */
+    public void chatMessage(String playerName, String message) {
+        this.sendMessage("<" + playerName + "> " + message);
+    }
+
+    /**
+     * Informs the chatshare network that a player has joined this server
+     *
+     * @param String playerName The display name of the player
+     */
+    public void playerJoined(String playerName) {
+        this.sendMessage(playerName + " has joined " + this.config.getName());
+    }
+
+    /**
+     * Informs the chatshare network that a player has left this server
+     *
+     * @param String playerName The display name of the player
+     */
+    public void playerLeft(String playerName) {
+        this.sendMessage(playerName + " has left " + this.config.getName());
+    }
+
+
 }
