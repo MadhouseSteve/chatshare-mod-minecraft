@@ -24,11 +24,15 @@ public class WebsocketHandler extends SimpleChannelInboundHandler<TextWebSocketF
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) {
         LOGGER.info("Received a message from the ChatShare service: " + msg.text());
         if (msg.text().equals("HELLO")) {
-            this.ws.sendMessage(this.config.getName() + "::" + new String(Base64.getDecoder().decode(this.config.getPassword())), true);
-//            this.ws.sendMessage("version::" + new String(Base64.getDecoder().decode(this.config.getVersion)), true);
+            this.ws.sendMessage(this.config.getName() + "::" + new String(Base64.getDecoder().decode(this.config.getPassword())));
+            this.ws.sendMessage("VERSION::2.1");
         } else {
-            this.cs.broadcast(msg.text());
-            // server.getPlayerList().sendMessage new TextComponentString(msg.text())
+            Message message = Message.fromJSON(msg.text());
+            if (message.getType() == MessageType.MESSAGE) {
+                this.cs.broadcast("[" + message.getSender() + "] <" + message.getName() + "> " + message.getMessage());
+            } else if (message.getType() == MessageType.PING) {
+                this.ws.sendMessage(new Message(MessageType.PONG));
+            }
         }
     }
 

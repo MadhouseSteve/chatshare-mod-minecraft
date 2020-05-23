@@ -39,16 +39,13 @@ public class Websocket extends Thread {
     }
 
     public void sendMessage(String message) {
-        this.sendMessage(message, false);
+        LOGGER.info("Sending a plain message to ChatShare service");
+        this.ch.writeAndFlush(new TextWebSocketFrame(message));
     }
 
-    public void sendMessage(String message, boolean secret) {
-        if (secret) {
-            LOGGER.info("Sending a secret message to ChatShare service");
-        } else {
-            LOGGER.info("Sending a message to ChatShare service: " + message);
-        }
-        this.ch.writeAndFlush(new TextWebSocketFrame(message));
+    public void sendMessage(Message message) {
+        LOGGER.info("Sending a packaged message to ChatShare service");
+        this.ch.writeAndFlush(new TextWebSocketFrame(message.toJSON()));
     }
 
     public void run() {
@@ -74,7 +71,7 @@ public class Websocket extends Thread {
             protected void initChannel(SocketChannel ch) {
                 try {
                     ch.pipeline().addLast(
-                            SslContextBuilder.forClient().build().newHandler(ch.alloc(), uri.getHost(), uri.getPort()),
+//                            SslContextBuilder.forClient().build().newHandler(ch.alloc(), uri.getHost(), uri.getPort()),
                             new HttpClientCodec(),
                             new HttpObjectAggregator(8192),
                             handler,
@@ -124,7 +121,9 @@ public class Websocket extends Thread {
      * @param String message The message that the player sent
      */
     public void chatMessage(String playerName, String message) {
-        this.sendMessage("<" + playerName + "> " + message);
+        Message msg = new Message(MessageType.MESSAGE);
+        msg.setName(playerName).setMessage(message);
+        this.sendMessage(msg);
     }
 
     /**
@@ -133,7 +132,9 @@ public class Websocket extends Thread {
      * @param String playerName The display name of the player
      */
     public void playerJoined(String playerName) {
-        this.sendMessage(playerName + " has joined " + this.config.getName());
+        Message msg = new Message(MessageType.JOIN);
+        msg.setName(playerName);
+        this.sendMessage(msg);
     }
 
     /**
@@ -142,8 +143,8 @@ public class Websocket extends Thread {
      * @param String playerName The display name of the player
      */
     public void playerLeft(String playerName) {
-        this.sendMessage(playerName + " has left " + this.config.getName());
+        Message msg = new Message(MessageType.LEAVE);
+        msg.setName(playerName);
+        this.sendMessage(msg);
     }
-
-
 }
