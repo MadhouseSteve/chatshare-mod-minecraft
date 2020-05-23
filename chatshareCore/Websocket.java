@@ -1,15 +1,21 @@
-package com.madhouseminers.chatshare;
+package com.madhouseminers.chatshareCore;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.EmptyHttpHeaders;
+import io.netty.handler.codec.http.HttpClientCodec;
+import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketClientProtocolHandler;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
+import io.netty.handler.ssl.SslContextBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,15 +25,16 @@ import java.util.concurrent.TimeUnit;
 public class Websocket extends Thread {
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final URI uri = URI.create("wss://" + Config.SERVER.get() + ":" + Config.PORT.get() + "/ws");
-    private Chatshare cs;
+    private ChatShareMod cs;
     private Channel ch;
     private EventLoopGroup loop;
     private Bootstrap b;
+    private ModConfig config;
 
-    public Websocket(Chatshare cs) {
+    public Websocket(ChatShareMod cs, ModConfig config) {
         super("Chatshare");
 
+        this.config = config;
         this.cs = cs;
     }
 
@@ -50,6 +57,8 @@ public class Websocket extends Thread {
 
     public void connect() {
         LOGGER.info("Trying to connect to ChatShare service.");
+
+        URI uri = URI.create("wss://" + config.getServer() + ":" + config.getPort() + "/ws");
         this.loop = new NioEventLoopGroup();
 
         final WebSocketClientProtocolHandler handler = new WebSocketClientProtocolHandler(
@@ -57,7 +66,7 @@ public class Websocket extends Thread {
                         uri, WebSocketVersion.V13, null, false, EmptyHttpHeaders.INSTANCE
                 )
         );
-        WebsocketHandler wsh = new WebsocketHandler(this, this.cs);
+        WebsocketHandler wsh = new WebsocketHandler(this, this.cs, this.config);
 
         this.b = new Bootstrap();
         this.b.group(loop).channel(NioSocketChannel.class).handler(new ChannelInitializer<SocketChannel>() {
@@ -65,6 +74,7 @@ public class Websocket extends Thread {
             protected void initChannel(SocketChannel ch) {
                 try {
                     ch.pipeline().addLast(
+                            SslContextBuilder.forClient().build().newHandler(ch.alloc(), uri.getHost(), uri.getPort()),
                             new HttpClientCodec(),
                             new HttpObjectAggregator(8192),
                             handler,

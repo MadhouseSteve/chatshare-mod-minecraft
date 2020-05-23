@@ -6,7 +6,9 @@ import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.nio.file.Path;
 
-public class Config {
+import com.madhouseminers.chatshareCore.ModConfig;
+
+public class Config implements ModConfig {
 
     public static final String CATEGORY_SERVER = "chatshare";
 
@@ -36,5 +38,21 @@ public class Config {
 
         config.load();
         spec.setConfig(config);
+    }
+
+    public String getName() {
+        return Config.NAME.get();
+    }
+
+    public String getServer() {
+        return Config.SERVER.get();
+    }
+
+    public String getPassword() {
+        return Config.PASSWORD.get();
+    }
+
+    public int getPort() {
+        return Config.PORT.get();
     }
 }
