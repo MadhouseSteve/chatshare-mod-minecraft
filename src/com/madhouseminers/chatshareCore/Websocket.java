@@ -16,6 +16,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketClientHandshakerFactory;
 import io.netty.handler.codec.http.websocketx.WebSocketClientProtocolHandler;
 import io.netty.handler.codec.http.websocketx.WebSocketVersion;
 import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,6 +31,7 @@ public class Websocket extends Thread {
     private EventLoopGroup loop;
     private Bootstrap b;
     private ModConfig config;
+    private boolean stopping = false;
 
     public Websocket(ChatShareMod cs, ModConfig config) {
         super("Chatshare");
@@ -55,7 +57,7 @@ public class Websocket extends Thread {
     public void connect() {
         LOGGER.info("Trying to connect to ChatShare service.");
 
-        URI uri = URI.create("wss://" + config.getServer() + ":" + config.getPort() + "/ws");
+        URI uri = URI.create(config.getProtocol() + "://" + config.getServer() + ":" + config.getPort() + "/ws");
         this.loop = new NioEventLoopGroup();
 
         final WebSocketClientProtocolHandler handler = new WebSocketClientProtocolHandler(
@@ -70,8 +72,10 @@ public class Websocket extends Thread {
             @Override
             protected void initChannel(SocketChannel ch) {
                 try {
+                    if (config.getProtocol().equals("wss")) {
+                        ch.pipeline().addLast(SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build().newHandler(ch.alloc(), uri.getHost(), uri.getPort()));
+                    }
                     ch.pipeline().addLast(
-//                            SslContextBuilder.forClient().build().newHandler(ch.alloc(), uri.getHost(), uri.getPort()),
                             new HttpClientCodec(),
                             new HttpObjectAggregator(8192),
                             handler,
@@ -96,6 +100,9 @@ public class Websocket extends Thread {
     }
 
     public void reconnect() {
+        if (this.stopping) {
+            return;
+        }
         this.close();
         try {
             sleep(1000);
@@ -103,6 +110,11 @@ public class Websocket extends Thread {
             LOGGER.info("Sleep interrupted");
         }
         this.connect();
+    }
+
+    public void gracefulStop() {
+        this.stopping = true;
+        this.close();
     }
 
     public void close() {
@@ -117,8 +129,8 @@ public class Websocket extends Thread {
     /**
      * Sends the chat message to the chatshare network
      *
-     * @param String playerName The display name of the player
-     * @param String message The message that the player sent
+     * @param playerName The display name of the player
+     * @param message The message that the player sent
      */
     public void chatMessage(String playerName, String message) {
         Message msg = new Message(MessageType.MESSAGE);
@@ -129,7 +141,7 @@ public class Websocket extends Thread {
     /**
      * Informs the chatshare network that a player has joined this server
      *
-     * @param String playerName The display name of the player
+     * @param playerName The display name of the player
      */
     public void playerJoined(String playerName) {
         Message msg = new Message(MessageType.JOIN);
@@ -140,7 +152,7 @@ public class Websocket extends Thread {
     /**
      * Informs the chatshare network that a player has left this server
      *
-     * @param String playerName The display name of the player
+     * @param playerName The display name of the player
      */
     public void playerLeft(String playerName) {
         Message msg = new Message(MessageType.LEAVE);

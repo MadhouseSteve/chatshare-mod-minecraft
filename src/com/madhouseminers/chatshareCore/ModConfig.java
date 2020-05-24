@@ -5,4 +5,5 @@ public interface ModConfig {
     String getServer();
     int getPort();
     String getPassword();
+    String getProtocol();
 }

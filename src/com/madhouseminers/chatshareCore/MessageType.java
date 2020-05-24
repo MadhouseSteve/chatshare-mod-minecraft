@@ -6,4 +6,4 @@ enum MessageType {
     JOIN,
     LEAVE,
     MESSAGE
-};
+}

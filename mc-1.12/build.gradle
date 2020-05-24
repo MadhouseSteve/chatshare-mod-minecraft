@@ -17,6 +17,15 @@ version = modVersion
 group = modGroup
 archivesBaseName = modBaseName
 
+sourceSets {
+    main {
+        java {
+            srcDirs 'mc-1.12/src'
+            srcDirs '../src'
+        }
+    }
+}
+
 minecraft {
     version = project.forgeVersion
     runDir = "run"
