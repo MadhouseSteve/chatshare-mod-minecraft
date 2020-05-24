@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/mc-1.15/chatshare-mod-minecraft.iml" filepath="$PROJECT_DIR$/mc-1.15/chatshare-mod-minecraft.iml" />
       <module fileurl="file://$PROJECT_DIR$/src/chatshareCore.iml" filepath="$PROJECT_DIR$/src/chatshareCore.iml" />
     </modules>
   </component>
