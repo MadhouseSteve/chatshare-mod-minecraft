@@ -24,7 +24,7 @@ class WebsocketHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) {
-        LOGGER.info("Received a message from the ChatShare service: " + msg.text());
+        LOGGER.debug("Received a message from the ChatShare service: " + msg.text());
         if (msg.text().equals("HELLO")) {
             this.ws.sendMessage(this.config.getName() + "::" + new String(Base64.getDecoder().decode(this.config.getPassword())));
         } else if (msg.text().equals("WELCOME")) {
@@ -50,5 +50,3 @@ class WebsocketHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
         this.ws.reconnect();
     }
 }
-
-

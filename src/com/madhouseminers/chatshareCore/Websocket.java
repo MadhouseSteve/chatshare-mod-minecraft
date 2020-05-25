@@ -20,6 +20,7 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.net.ssl.SSLException;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
 
@@ -41,12 +42,12 @@ public class Websocket extends Thread {
     }
 
     public void sendMessage(String message) {
-        LOGGER.info("Sending a plain message to ChatShare service");
+        LOGGER.debug("Sending a plain message to ChatShare service");
         this.ch.writeAndFlush(new TextWebSocketFrame(message));
     }
 
     public void sendMessage(Message message) {
-        LOGGER.info("Sending a packaged message to ChatShare service");
+        LOGGER.debug("Sending a packaged message to ChatShare service");
         this.ch.writeAndFlush(new TextWebSocketFrame(message.toJSON()));
     }
 
@@ -81,7 +82,7 @@ public class Websocket extends Thread {
                             handler,
                             wsh
                     );
-                } catch (Exception e) {
+                } catch (SSLException e) {
                     LOGGER.error("Failed to create SSL context: " + e.getMessage());
                 }
             }

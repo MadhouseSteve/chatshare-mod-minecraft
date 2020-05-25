@@ -25,7 +25,6 @@ import com.madhouseminers.chatshareCore.ChatShareMod;
 public class Chatshare implements ChatShareMod {
 
     // Directly reference a log4j logger.
-    private static final Logger LOGGER = LogManager.getLogger();
     public MinecraftServer server;
     private Websocket ws;
     private Config config;
