@@ -8,12 +8,7 @@ on:
 
 jobs:
   build_1_15:
-
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./mc-1.15
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 8
@@ -22,17 +17,13 @@ jobs:
           java-version: '8'
           distribution: 'temurin'
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
+        working-directory: ./mc-1.15
+        run: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
         with:
           arguments: build
 
   build_1_16:
-
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./mc-1.16
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 8
@@ -41,17 +32,13 @@ jobs:
           java-version: '8'
           distribution: 'temurin'
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
+        working-directory: ./mc-1.16
+        run: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
         with:
           arguments: build
 
   build_1_18:
-
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./mc-1.16
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 8
@@ -60,6 +47,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
+        working-directory: ./mc-1.18
+        run: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
         with:
           arguments: build
