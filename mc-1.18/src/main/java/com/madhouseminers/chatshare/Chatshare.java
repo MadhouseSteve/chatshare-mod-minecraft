@@ -1,7 +1,7 @@
 package com.madhouseminers.chatshare;
 
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -10,8 +10,6 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
@@ -41,14 +39,13 @@ public class Chatshare implements ChatShareMod {
     }
 
     @SubscribeEvent
-    public void onServerStarted(FMLServerStartedEvent event) {
-        this.server = event.getServer();
+    public void onServerStarted() {
         this.ws = new Websocket(this, this.config);
         this.ws.start();
     }
 
     @SubscribeEvent
-    public void onServerStopping(FMLServerStoppingEvent event) {
+    public void onServerStopping() {
         this.ws.gracefulStop();
     }
 
@@ -69,6 +66,6 @@ public class Chatshare implements ChatShareMod {
 
     public void broadcast(String message) {
         //this.server.getPlayerList().sendMessageToTeamOrAllPlayers(new StringTextComponent(message));
-        this.server.getPlayerList().getPlayers().forEach(player -> player.sendMessage(new StringTextComponent(message), player.getUniqueID()));
+        this.server.getPlayerList().getPlayers().forEach(player -> player.sendMessage(new TextComponent(message), player.getUUID()));
     }
 }
