@@ -18,7 +18,8 @@ jobs:
           distribution: 'temurin'
       - name: Build with Gradle
         working-directory: ./mc-1.15
-        run: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7 build
+        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
+        run: gradle build
 
   build_1_16:
     runs-on: ubuntu-latest
@@ -31,7 +32,8 @@ jobs:
           distribution: 'temurin'
       - name: Build with Gradle
         working-directory: ./mc-1.16
-        run: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7 build
+        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
+        run: gradle build
 
   build_1_18:
     runs-on: ubuntu-latest
@@ -44,4 +46,5 @@ jobs:
           distribution: 'temurin'
       - name: Build with Gradle
         working-directory: ./mc-1.18
-        run: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7 build
+        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
+        run: gradle build
